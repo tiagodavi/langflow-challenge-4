@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Document {
+  id Int @id @default(autoincrement())
+  name String
+  path String?
+  topics Topic[]
+  createdAt DateTime @default(now())
+}
+
+model Topic {
+  id Int @id @default(autoincrement())
+  document Document @relation(fields: [documentId], references: [id])
+  documentId Int
+  quizzes Quiz[]
+  name String
+}
+
+model Quiz {
+  id Int @id @default(autoincrement())
+  topic Topic @relation(fields: [topicId], references: [id])
+  topicId Int
+  questions Question[]
+  name String
+  createdAt DateTime @default(now())
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+  quiz Quiz @relation(fields: [quizId], references: [id])
+  quizId Int
+  answers Answer[]
+  results Result[]
+  name String
+}
+
+model Answer {
+  id Int @id @default(autoincrement())
+  question Question @relation(fields: [questionId], references: [id])
+  questionId Int
+  results Result[]
+  name String
+  valid Boolean @default(false)
+}
+
+model Result {
+  id Int @id @default(autoincrement())
+  question Question @relation(fields: [questionId], references: [id])
+  answer Answer @relation(fields: [answerId], references: [id])
+  questionId Int
+  answerId Int
+  userId Int?
+  createdAt DateTime @default(now())
+}
